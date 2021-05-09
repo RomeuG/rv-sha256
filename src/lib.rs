@@ -162,8 +162,9 @@ impl Sha256 {
             }
 
             self.transform();
+
             unsafe {
-                write_bytes(&mut self.data as *mut _, 0x0, 56);
+                write_bytes(self.data.as_mut_ptr(), 0x0, 56);
             }
         }
 
