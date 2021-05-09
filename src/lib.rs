@@ -1,8 +1,10 @@
 #![no_std]
-
 #![feature(core_intrinsics)]
 
-#![allow(arithmetic_overflow)]
+#![feature(test)]
+#[allow(soft_unstable)]
+extern crate test;
+use test::Bencher;
 
 use core::default::Default;
 use core::convert::TryInto;
@@ -27,37 +29,37 @@ const K: [u32; 64] = [
 
 // choose
 #[inline(always)]
-pub fn ch(x: u32, y: u32, z: u32) -> u32 {
+fn ch(x: u32, y: u32, z: u32) -> u32 {
     ((x) & (y)) ^ (!(x) & (z))
 }
 
 // majority
 #[inline(always)]
-pub fn maj(x: u32, y: u32, z: u32) -> u32 {
+fn maj(x: u32, y: u32, z: u32) -> u32 {
     ((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z))
 }
 
 #[inline(always)]
-pub fn ep0(x: u32) -> u32 {
+fn ep0(x: u32) -> u32 {
     u32::rotate_right(x, 2)
         ^ u32::rotate_right(x, 13)
         ^ u32::rotate_right(x, 22)
 }
 
 #[inline(always)]
-pub fn ep1(x: u32) -> u32 {
+fn ep1(x: u32) -> u32 {
     u32::rotate_right(x, 6)
         ^ u32::rotate_right(x, 11)
         ^ u32::rotate_right(x, 25)
 }
 
 #[inline(always)]
-pub fn sig0(x: i32) -> i32 {
+fn sig0(x: i32) -> i32 {
     i32::rotate_right(x, 7) ^ i32::rotate_right(x, 18) ^ (((x as u32) >> 3) as i32)
 }
 
 #[inline(always)]
-pub fn sig1(x: i32) -> i32 {
+fn sig1(x: i32) -> i32 {
     i32::rotate_right(x, 17) ^ i32::rotate_right(x, 19) ^ (((x as u32) >> 10) as i32)
 }
 
@@ -84,10 +86,7 @@ impl Sha256 {
         }
 
         for i in 16..64 {
-            m[i] = (sig1(m[i - 2] as i32) +
-                (m[i - 7] as i32) +
-                (sig0(m[i - 15] as i32)) +
-                (m[i - 16] as i32)) as u32;
+            m[i] = sig1(m[i-2] as i32).wrapping_add(m[i-7] as i32).wrapping_add(sig0(m[i-15] as i32)).wrapping_add(m[i-16] as i32) as u32;
         }
 
         let mut a: u32 = self.state[0];
@@ -99,30 +98,29 @@ impl Sha256 {
         let mut g: u32 = self.state[6];
         let mut h: u32 = self.state[7];
 
-        let mut temp1 = 0;
-        let mut temp2 = 0;
 
         for i in 0..64 {
-            temp1 = h + ep1(e) + ch(e, f, g) + K[i] + m[i];
-            temp2 = ep0(a) + maj(a, b, c);
+            let temp1 = h.wrapping_add(ep1(e)).wrapping_add(ch(e,f,g)).wrapping_add(K[i]).wrapping_add(m[i]);
+            let temp2 = ep0(a).wrapping_add(maj(a,b,c));
+
             h = g;
             g = f;
             f = e;
-            e = d + temp1;
+            e = d.wrapping_add(temp1);
             d = c;
             c = b;
             b = a;
-            a = temp1 + temp2;
+            a = temp1.wrapping_add(temp2);
         }
 
-        self.state[0] += a;
-        self.state[1] += b;
-        self.state[2] += c;
-        self.state[3] += d;
-        self.state[4] += e;
-        self.state[5] += f;
-        self.state[6] += g;
-        self.state[7] += h;
+        self.state[0] = self.state[0].wrapping_add(a);
+        self.state[1] = self.state[1].wrapping_add(b);
+        self.state[2] = self.state[2].wrapping_add(c);
+        self.state[3] = self.state[3].wrapping_add(d);
+        self.state[4] = self.state[4].wrapping_add(e);
+        self.state[5] = self.state[5].wrapping_add(f);
+        self.state[6] = self.state[6].wrapping_add(g);
+        self.state[7] = self.state[7].wrapping_add(h);
     }
 
     pub fn update(&mut self, msg: &[u8]) {
@@ -169,7 +167,7 @@ impl Sha256 {
             }
         }
 
-        self.nbits += self.len * 8; // n bits
+        self.nbits += self.len * 8;
 
         self.data[63] = self.nbits as u8;
         self.data[62] = self.nbits.checked_shr(8).unwrap_or(0) as u8;
@@ -194,8 +192,8 @@ impl Sha256 {
         }
     }
 
-    pub fn sha256(data: &[u8]) -> [u8; 32] {
-        let mut sha256 = Sha256::default();
+    pub fn digest(data: &[u8]) -> [u8; 32] {
+        let mut sha256 = Self::default();
         sha256.update(data);
         sha256.finalize();
 
@@ -217,7 +215,6 @@ impl Default for Sha256 {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]
@@ -228,4 +225,14 @@ mod tests {
 
         assert_eq!(sha256.hash, sha256.hash[1..]);
     }
+
+    #[bench]
+    fn bench_add_two(b: &mut Bencher) {
+        b.iter(|| {
+            let mut sha256 = Sha256::default();
+            sha256.update("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".as_bytes());
+            sha256.finalize();
+        });
+    }
 }
+
