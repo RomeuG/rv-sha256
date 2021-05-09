@@ -1,3 +1,5 @@
+cargo-features = ["named-profiles"]
+
 [package]
 name = "SHA-256"
 version = "0.1.0"
@@ -7,3 +9,9 @@ edition = "2018"
 
 [dependencies]
 micromath = "1.1.1"
+
+[profile.dev]
+overflow-checks = false
+
+[profile.release]
+overflow-checks = false
