@@ -41,16 +41,12 @@ fn maj(x: u32, y: u32, z: u32) -> u32 {
 
 #[inline(always)]
 fn ep0(x: u32) -> u32 {
-    u32::rotate_right(x, 2)
-        ^ u32::rotate_right(x, 13)
-        ^ u32::rotate_right(x, 22)
+    u32::rotate_right(u32::rotate_right(u32::rotate_right(x, 9) ^ x, 11) ^ x, 2)
 }
 
 #[inline(always)]
 fn ep1(x: u32) -> u32 {
-    u32::rotate_right(x, 6)
-        ^ u32::rotate_right(x, 11)
-        ^ u32::rotate_right(x, 25)
+    u32::rotate_right(u32::rotate_right(u32::rotate_right(x, 14) ^ x, 5) ^ x, 6)
 }
 
 #[inline(always)]
@@ -73,11 +69,11 @@ pub struct Sha256 {
 
 impl Sha256 {
     pub fn transform(&mut self) {
-        let mut m: [u32; 64] = [0; 64];
+        let mut w: [u32; 64] = [0; 64];
 
         let mut j: usize = 0;
         for i in 0..16 {
-            m[i] = ((self.data[j] as u32) << 24)
+            w[i] = ((self.data[j] as u32) << 24)
                 | ((self.data[j + 1] as u32) << 16)
                 | ((self.data[j + 2] as u32) << 8)
                 | (self.data[j + 3] as u32);
@@ -86,7 +82,7 @@ impl Sha256 {
         }
 
         for i in 16..64 {
-            m[i] = sig1(m[i-2] as i32).wrapping_add(m[i-7] as i32).wrapping_add(sig0(m[i-15] as i32)).wrapping_add(m[i-16] as i32) as u32;
+            w[i] = sig1(w[i-2] as i32).wrapping_add(w[i-7] as i32).wrapping_add(sig0(w[i-15] as i32)).wrapping_add(w[i-16] as i32) as u32;
         }
 
         let mut a: u32 = self.state[0];
@@ -100,7 +96,7 @@ impl Sha256 {
 
 
         for i in 0..64 {
-            let temp1 = h.wrapping_add(ep1(e)).wrapping_add(ch(e,f,g)).wrapping_add(K[i]).wrapping_add(m[i]);
+            let temp1 = h.wrapping_add(ep1(e)).wrapping_add(ch(e,f,g)).wrapping_add(K[i]).wrapping_add(w[i]);
             let temp2 = ep0(a).wrapping_add(maj(a,b,c));
 
             h = g;
