@@ -1,8 +1,6 @@
 #![no_std]
 #![feature(core_intrinsics)]
-
 #![feature(test)]
-#[allow(soft_unstable)]
 extern crate test;
 use test::Bencher;
 
@@ -60,9 +58,9 @@ fn sig1(x: i32) -> i32 {
 }
 
 pub struct Sha256 {
+    pub hash: [u8; 32],
     data: [u8; 64],
     state: [u32; 8],
-    pub hash: [u8; 32],
     len: u32,
     nbits: u32,
 }
@@ -72,8 +70,9 @@ impl Sha256 {
         let mut w: [u32; 64] = [0; 64];
 
         let mut j: usize = 0;
-        for i in 0..16 {
-            w[i] = ((self.data[j] as u32) << 24)
+        // for i in 0..16 {
+        for item in w.iter_mut().take(16) {
+            *item = ((self.data[j] as u32) << 24)
                 | ((self.data[j + 1] as u32) << 16)
                 | ((self.data[j + 2] as u32) << 8)
                 | (self.data[j + 3] as u32);
@@ -122,9 +121,8 @@ impl Sha256 {
     pub fn update(&mut self, msg: &[u8]) {
         let len = msg.len();
 
-        for i in 0..len {
-
-            self.data[self.len as usize] = msg[i];
+        for item in msg.iter().take(len) {
+            self.data[self.len as usize] = *item;
             self.len += 1;
 
             if self.len == 64 {
@@ -134,24 +132,20 @@ impl Sha256 {
                 self.len = 0;
             }
         }
-
     }
 
     pub fn finalize(&mut self) {
         let mut current_length: usize = self.len.try_into().ok().unwrap();
 
-        if self.len < 56 {
-            self.data[current_length] = 0x80;
-            current_length += 1;
+        self.data[current_length] = 0x80;
+        current_length += 1;
 
+        if self.len < 56 {
             while current_length < 56 {
                 self.data[current_length] = 0x00;
                 current_length += 1;
             }
         } else {
-            self.data[current_length] = 0x80;
-            current_length += 1;
-
             while current_length < 64 {
                 self.data[current_length] = 0x00;
                 current_length += 1;
