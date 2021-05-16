@@ -1,8 +1,6 @@
 #![no_std]
 #![feature(core_intrinsics)]
 #![feature(test)]
-extern crate test;
-use test::Bencher;
 
 use core::default::Default;
 use core::convert::TryInto;
@@ -57,7 +55,9 @@ fn sig1(x: i32) -> i32 {
     i32::rotate_right(x, 17) ^ i32::rotate_right(x, 19) ^ (((x as u32) >> 10) as i32)
 }
 
+/// This struct represents a SHA256 state, which includes the result.
 pub struct Sha256 {
+    // This field will have the hashing result.
     pub hash: [u8; 32],
     data: [u8; 64],
     state: [u32; 8],
@@ -66,7 +66,7 @@ pub struct Sha256 {
 }
 
 impl Sha256 {
-    pub fn transform(&mut self) {
+    fn transform(&mut self) {
         let mut w: [u32; 64] = [0; 64];
 
         let mut j: usize = 0;
@@ -118,10 +118,17 @@ impl Sha256 {
         self.state[7] = self.state[7].wrapping_add(h);
     }
 
-    pub fn update(&mut self, msg: &[u8]) {
-        let len = msg.len();
+    ///
+    /// Updates hash with new value
+    ///
+    /// # Arguments
+    ///
+    /// * `data` - Data as *[u8]
+    ///
+    pub fn update(&mut self, data: &[u8]) {
+        let len = data.len();
 
-        for item in msg.iter().take(len) {
+        for item in data.iter().take(len) {
             self.data[self.len as usize] = *item;
             self.len += 1;
 
@@ -134,8 +141,11 @@ impl Sha256 {
         }
     }
 
+    ///
+    /// Generates final hash
+    ///
     pub fn finalize(&mut self) {
-        let mut current_length: usize = self.len.try_into().ok().unwrap();
+        let mut current_length: usize = self.len as usize;
 
         self.data[current_length] = 0x80;
         current_length += 1;
@@ -183,6 +193,50 @@ impl Sha256 {
         }
     }
 
+    ///
+    /// Receives string as bytes.
+    /// Returns String
+    ///
+    /// # Arguments
+    ///
+    /// * `data` - Data as &[u8]
+    ///
+    /// # Example
+    ///
+    /// ``` rust
+    /// use std::env;
+    ///
+    /// use sha256::Sha256;
+    ///
+    /// /// convert bytes to hex string
+    /// /// code taken from hex project: https://docs.rs/crate/hex/0.1.0/source/src/lib.rs
+    /// fn to_hex_string(data: &[u8]) -> String {
+    ///     static CHARS: &'static [u8] = b"0123456789abcdef";
+    ///
+    ///     let bytes = data.as_ref();
+    ///     let mut v = Vec::with_capacity(bytes.len() * 2);
+    ///     for &byte in bytes.iter() {
+    ///         v.push(CHARS[(byte >> 4) as usize]);
+    ///         v.push(CHARS[(byte & 0xf) as usize]);
+    ///     }
+    ///
+    ///     unsafe {
+    ///         String::from_utf8_unchecked(v)
+    ///     }
+    /// }
+    ///
+    /// fn main() {
+    ///     let args: Vec<String> = env::args().collect();
+    ///
+    ///     if args.len() == 2 {
+    ///         let text = &args[1];
+    ///         let hash = Sha256::digest(text.as_bytes());
+    ///
+    ///         println!("{}", to_hex_string(&hash));
+    ///     }
+    /// }
+    /// ```
+    ///
     pub fn digest(data: &[u8]) -> [u8; 32] {
         let mut sha256 = Self::default();
         sha256.update(data);
@@ -207,6 +261,9 @@ impl Default for Sha256 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    extern crate test;
+    use test::Bencher;
 
     #[test]
     fn sha256_32bytes() {

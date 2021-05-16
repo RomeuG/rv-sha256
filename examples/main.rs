@@ -1,6 +1,6 @@
 use std::env;
 
-use sha256::{self, Sha256};
+use sha256::Sha256;
 
 /// convert bytes to hex string
 /// code taken from hex project: https://docs.rs/crate/hex/0.1.0/source/src/lib.rs

@@ -1,7 +1,7 @@
 cargo-features = ["named-profiles"]
 
 [package]
-name = "SHA-256"
+name = "sha256"
 version = "0.1.0"
 edition = "2018"
 
