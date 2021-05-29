@@ -3,8 +3,6 @@
 #![feature(test)]
 
 use core::default::Default;
-use core::convert::TryInto;
-
 use core::ptr::write_bytes;
 
 // constants
