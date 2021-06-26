@@ -1,6 +1,6 @@
 use std::env;
 
-use sha256::Sha256;
+use sha256::sha256::Sha256;
 
 /// convert bytes to hex string
 /// code taken from hex project: https://docs.rs/crate/hex/0.1.0/source/src/lib.rs
@@ -14,9 +14,7 @@ fn to_hex_string(data: &[u8]) -> String {
         v.push(CHARS[(byte & 0xf) as usize]);
     }
 
-    unsafe {
-        String::from_utf8_unchecked(v)
-    }
+    unsafe { String::from_utf8_unchecked(v) }
 }
 
 fn main() {
