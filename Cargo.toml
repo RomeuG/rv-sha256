@@ -3,6 +3,10 @@ cargo-features = ["named-profiles"]
 [package]
 name = "sha256"
 version = "0.1.0"
+authors = ["Romeu Vieira <romeu.bizz@gmail.com>"]
+description = "SHA-256 implementation"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

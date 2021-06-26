@@ -4,6 +4,8 @@ SHA-256 in Rust
 This is an implementation of the SHA-256 Hashing Algorithm in Rust, without the use of the
 Rust Standard Library.
 
+This project uses the **nightly** version of Rust.
+
 Example
 =======
 
