@@ -1,9 +1,12 @@
 #![no_std]
+#![feature(stmt_expr_attributes)]
 #![feature(core_intrinsics)]
 #![feature(test)]
 
-pub mod sha256;
+#[macro_use]
 pub mod utils;
+pub mod sha256;
+pub mod sha256_avx2;
 
 #[cfg(test)]
 mod tests {
