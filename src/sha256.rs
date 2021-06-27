@@ -42,27 +42,59 @@ pub struct Sha256 {
     nbits: u32,
 }
 
+macro_rules! SHA256_FUNCTION_16 {
+    ($self:ident,$a:expr,$b:expr,$c:expr,$d:expr,$e:expr,$f:expr,$g:expr,$h:expr,$i:expr,$w:expr,$j:expr) => {
+        $w[$i] = (($self.data[$j] as u32) << 24)
+            | (($self.data[$j + 1] as u32) << 16)
+            | (($self.data[$j + 2] as u32) << 8)
+            | ($self.data[$j + 3] as u32);
+
+        let temp1 = $h
+            .wrapping_add(ep1($e))
+            .wrapping_add(ch($e, $f, $g))
+            .wrapping_add(K[$i])
+            .wrapping_add($w[$i]);
+        let temp2 = ep0($a).wrapping_add(maj($a, $b, $c));
+
+        $h = $g;
+        $g = $f;
+        $f = $e;
+        $e = $d.wrapping_add(temp1);
+        $d = $c;
+        $c = $b;
+        $b = $a;
+        $a = temp1.wrapping_add(temp2);
+    };
+}
+
+macro_rules! SHA256_FUNCTION_48 {
+    ($a:expr,$b:expr,$c:expr,$d:expr,$e:expr,$f:expr,$g:expr,$h:expr,$w:expr,$i:expr) => {
+        $w[$i] = sig1($w[$i - 2] as i32)
+            .wrapping_add($w[$i - 7] as i32)
+            .wrapping_add(sig0($w[$i - 15] as i32))
+            .wrapping_add($w[$i - 16] as i32) as u32;
+
+        let temp1 = $h
+            .wrapping_add(ep1($e))
+            .wrapping_add(ch($e, $f, $g))
+            .wrapping_add(K[$i])
+            .wrapping_add($w[$i]);
+        let temp2 = ep0($a).wrapping_add(maj($a, $b, $c));
+
+        $h = $g;
+        $g = $f;
+        $f = $e;
+        $e = $d.wrapping_add(temp1);
+        $d = $c;
+        $c = $b;
+        $b = $a;
+        $a = temp1.wrapping_add(temp2);
+    };
+}
+
 impl Sha256 {
     fn transform(&mut self) {
         let mut w: [u32; 64] = [0; 64];
-
-        let mut j: usize = 0;
-        // for i in 0..16 {
-        for item in w.iter_mut().take(16) {
-            *item = ((self.data[j] as u32) << 24)
-                | ((self.data[j + 1] as u32) << 16)
-                | ((self.data[j + 2] as u32) << 8)
-                | (self.data[j + 3] as u32);
-
-            j += 4;
-        }
-
-        for i in 16..64 {
-            w[i] = sig1(w[i - 2] as i32)
-                .wrapping_add(w[i - 7] as i32)
-                .wrapping_add(sig0(w[i - 15] as i32))
-                .wrapping_add(w[i - 16] as i32) as u32;
-        }
 
         let mut a: u32 = self.state[0];
         let mut b: u32 = self.state[1];
@@ -73,23 +105,71 @@ impl Sha256 {
         let mut g: u32 = self.state[6];
         let mut h: u32 = self.state[7];
 
-        for i in 0..64 {
-            let temp1 = h
-                .wrapping_add(ep1(e))
-                .wrapping_add(ch(e, f, g))
-                .wrapping_add(K[i])
-                .wrapping_add(w[i]);
-            let temp2 = ep0(a).wrapping_add(maj(a, b, c));
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 0, w, 0);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 1, w, 4);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 2, w, 8);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 3, w, 12);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 4, w, 16);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 5, w, 20);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 6, w, 24);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 7, w, 28);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 8, w, 32);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 9, w, 36);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 10, w, 40);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 11, w, 44);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 12, w, 48);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 13, w, 52);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 14, w, 56);
+        SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 15, w, 60);
 
-            h = g;
-            g = f;
-            f = e;
-            e = d.wrapping_add(temp1);
-            d = c;
-            c = b;
-            b = a;
-            a = temp1.wrapping_add(temp2);
-        }
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 16);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 17);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 18);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 19);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 20);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 21);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 22);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 23);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 24);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 25);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 26);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 27);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 28);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 29);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 30);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 31);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 32);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 33);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 34);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 35);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 36);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 37);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 38);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 39);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 40);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 41);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 42);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 43);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 44);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 45);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 46);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 47);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 48);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 49);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 50);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 51);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 52);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 53);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 54);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 55);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 56);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 57);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 58);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 59);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 60);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 61);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 62);
+        SHA256_FUNCTION_48!(a, b, c, d, e, f, g, h, w, 63);
 
         self.state[0] = self.state[0].wrapping_add(a);
         self.state[1] = self.state[1].wrapping_add(b);
