@@ -111,8 +111,9 @@ impl Sha256 {
     pub fn update(&mut self, data: &[u8]) {
         let len = data.len();
 
-        for item in data.iter().take(len) {
-            self.data[self.len as usize] = *item;
+        for index in 0..len {
+            self.data[self.len as usize] = data[index];
+
             self.len += 1;
 
             if self.len == 64 {
