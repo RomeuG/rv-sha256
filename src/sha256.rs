@@ -42,13 +42,17 @@ pub struct Sha256 {
     nbits: u32,
 }
 
+macro_rules! SHA256_W_ASSIGN {
+    ($self:ident,$i:expr,$w:expr) => {
+        $w = (($self.data[$i] as u32) << 24)
+            | (($self.data[$i + 1] as u32) << 16)
+            | (($self.data[$i + 2] as u32) << 8)
+            | ($self.data[$i + 3] as u32);
+    };
+}
+
 macro_rules! SHA256_FUNCTION_16 {
     ($self:ident,$a:expr,$b:expr,$c:expr,$d:expr,$e:expr,$f:expr,$g:expr,$h:expr,$i:expr,$w:expr,$j:expr) => {
-        $w = (($self.data[$j] as u32) << 24)
-            | (($self.data[$j + 1] as u32) << 16)
-            | (($self.data[$j + 2] as u32) << 8)
-            | ($self.data[$j + 3] as u32);
-
         let temp1 = $h
             .wrapping_add(ep1($e))
             .wrapping_add(ch($e, $f, $g))
@@ -119,6 +123,23 @@ impl Sha256 {
         let mut f: u32 = self.state[5];
         let mut g: u32 = self.state[6];
         let mut h: u32 = self.state[7];
+
+        SHA256_W_ASSIGN!(self, 0, w0);
+        SHA256_W_ASSIGN!(self, 4, w1);
+        SHA256_W_ASSIGN!(self, 8, w2);
+        SHA256_W_ASSIGN!(self, 12, w3);
+        SHA256_W_ASSIGN!(self, 16, w4);
+        SHA256_W_ASSIGN!(self, 20, w5);
+        SHA256_W_ASSIGN!(self, 24, w6);
+        SHA256_W_ASSIGN!(self, 28, w7);
+        SHA256_W_ASSIGN!(self, 32, w8);
+        SHA256_W_ASSIGN!(self, 36, w9);
+        SHA256_W_ASSIGN!(self, 40, w10);
+        SHA256_W_ASSIGN!(self, 44, w11);
+        SHA256_W_ASSIGN!(self, 48, w12);
+        SHA256_W_ASSIGN!(self, 52, w13);
+        SHA256_W_ASSIGN!(self, 56, w14);
+        SHA256_W_ASSIGN!(self, 60, w15);
 
         SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 0, w0, 0);
         SHA256_FUNCTION_16!(self, a, b, c, d, e, f, g, h, 1, w1, 4);
