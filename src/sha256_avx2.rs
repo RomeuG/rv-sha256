@@ -391,6 +391,73 @@ impl Sha256Avx2 {
         self.state[7] = unsafe { _mm256_add_epi32(self.state[7], h) };
     }
 
+    #[inline(always)]
+    fn update1(&mut self, data: &[u8]) {
+        self.update(data, data, data, data, data, data, data, data);
+    }
+
+    #[inline(always)]
+    fn update2(&mut self, data1: &[u8], data2: &[u8]) {
+        self.update(data1, data2, data2, data2, data2, data2, data2, data2);
+    }
+
+    #[inline(always)]
+    fn update3(&mut self, data1: &[u8], data2: &[u8], data3: &[u8]) {
+        self.update(data1, data2, data3, data3, data3, data3, data3, data3);
+    }
+
+    #[inline(always)]
+    fn update4(&mut self, data1: &[u8], data2: &[u8], data3: &[u8], data4: &[u8]) {
+        self.update(data1, data2, data3, data4, data4, data4, data4, data4);
+    }
+
+    #[inline(always)]
+    fn update5(&mut self, data1: &[u8], data2: &[u8], data3: &[u8], data4: &[u8], data5: &[u8]) {
+        self.update(data1, data2, data3, data4, data5, data5, data5, data5);
+    }
+
+    #[inline(always)]
+    fn update6(
+        &mut self,
+        data1: &[u8],
+        data2: &[u8],
+        data3: &[u8],
+        data4: &[u8],
+        data5: &[u8],
+        data6: &[u8],
+    ) {
+        self.update(data1, data2, data3, data4, data5, data6, data6, data6);
+    }
+
+    #[inline(always)]
+    fn update7(
+        &mut self,
+        data1: &[u8],
+        data2: &[u8],
+        data3: &[u8],
+        data4: &[u8],
+        data5: &[u8],
+        data6: &[u8],
+        data7: &[u8],
+    ) {
+        self.update(data1, data2, data3, data4, data5, data6, data7, data7);
+    }
+
+    #[inline(always)]
+    fn update8(
+        &mut self,
+        data1: &[u8],
+        data2: &[u8],
+        data3: &[u8],
+        data4: &[u8],
+        data5: &[u8],
+        data6: &[u8],
+        data7: &[u8],
+        data8: &[u8],
+    ) {
+        self.update(data1, data2, data3, data4, data5, data6, data7, data8);
+    }
+
     pub fn update(
         &mut self,
         data1: &[u8],
@@ -504,12 +571,92 @@ impl Sha256Avx2 {
         }
     }
 
-    pub fn digest(data: &[u8]) -> [[u8; 32]; 8] {
-        let mut sha256 = Self::default();
-        sha256.update(data, data, data, data, data, data, data, data);
-        sha256.finalize();
+    pub fn digest(input: &[u8]) -> [[u8; 32]; 8] {
+        let mut object = Self::default();
+        object.update1(input);
+        object.finalize();
+        object.hash
+    }
 
-        sha256.hash
+    pub fn digest2(input1: &[u8], input2: &[u8]) -> [[u8; 32]; 8] {
+        let mut object = Self::default();
+        object.update2(input1, input2);
+        object.finalize();
+        object.hash
+    }
+
+    pub fn digest3(input1: &[u8], input2: &[u8], input3: &[u8]) -> [[u8; 32]; 8] {
+        let mut object = Self::default();
+        object.update3(input1, input2, input3);
+        object.finalize();
+        object.hash
+    }
+
+    pub fn digest4(input1: &[u8], input2: &[u8], input3: &[u8], input4: &[u8]) -> [[u8; 32]; 8] {
+        let mut object = Self::default();
+        object.update4(input1, input2, input3, input4);
+        object.finalize();
+        object.hash
+    }
+
+    pub fn digest5(
+        input1: &[u8],
+        input2: &[u8],
+        input3: &[u8],
+        input4: &[u8],
+        input5: &[u8],
+    ) -> [[u8; 32]; 8] {
+        let mut object = Self::default();
+        object.update5(input1, input2, input3, input4, input5);
+        object.finalize();
+        object.hash
+    }
+
+    pub fn digest6(
+        input1: &[u8],
+        input2: &[u8],
+        input3: &[u8],
+        input4: &[u8],
+        input5: &[u8],
+        input6: &[u8],
+    ) -> [[u8; 32]; 8] {
+        let mut object = Self::default();
+        object.update6(input1, input2, input3, input4, input5, input6);
+        object.finalize();
+        object.hash
+    }
+
+    pub fn digest7(
+        input1: &[u8],
+        input2: &[u8],
+        input3: &[u8],
+        input4: &[u8],
+        input5: &[u8],
+        input6: &[u8],
+        input7: &[u8],
+    ) -> [[u8; 32]; 8] {
+        let mut object = Self::default();
+        object.update7(input1, input2, input3, input4, input5, input6, input7);
+        object.finalize();
+        object.hash
+    }
+
+    pub fn digest8(
+        input1: &[u8],
+        input2: &[u8],
+        input3: &[u8],
+        input4: &[u8],
+        input5: &[u8],
+        input6: &[u8],
+        input7: &[u8],
+        input8: &[u8],
+    ) -> [[u8; 32]; 8] {
+        let mut object = Self::default();
+        object.update8(
+            input1, input2, input3, input4, input5, input6, input7, input8,
+        );
+        object.finalize();
+        object.hash
     }
 }
 
