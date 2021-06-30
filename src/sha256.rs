@@ -44,10 +44,8 @@ pub struct Sha256 {
 
 macro_rules! SHA256_W_ASSIGN {
     ($self:ident,$i:expr,$w:expr) => {
-        $w = (($self.data[$i] as u32) << 24)
-            | (($self.data[$i + 1] as u32) << 16)
-            | (($self.data[$i + 2] as u32) << 8)
-            | ($self.data[$i + 3] as u32);
+        // NOTE: better performance!
+        $w = u32::from_be_bytes(unsafe { *(&$self.data[$i] as *const u8 as *const [u8; 4]) });
     };
 }
 
@@ -284,16 +282,45 @@ impl Sha256 {
 
         self.transform();
 
-        for i in 0..4 {
-            self.hash[i] = ((self.state[0] >> (24 - i * 8)) & 0x000000ff) as u8;
-            self.hash[i + 4] = ((self.state[1] >> (24 - i * 8)) & 0x000000ff) as u8;
-            self.hash[i + 8] = ((self.state[2] >> (24 - i * 8)) & 0x000000ff) as u8;
-            self.hash[i + 12] = ((self.state[3] >> (24 - i * 8)) & 0x000000ff) as u8;
-            self.hash[i + 16] = ((self.state[4] >> (24 - i * 8)) & 0x000000ff) as u8;
-            self.hash[i + 20] = ((self.state[5] >> (24 - i * 8)) & 0x000000ff) as u8;
-            self.hash[i + 24] = ((self.state[6] >> (24 - i * 8)) & 0x000000ff) as u8;
-            self.hash[i + 28] = ((self.state[7] >> (24 - i * 8)) & 0x000000ff) as u8;
-        }
+        self.hash[0] = (self.state[0] >> 24) as u8;
+        self.hash[1] = (self.state[0] >> 16) as u8;
+        self.hash[2] = (self.state[0] >> 8) as u8;
+        self.hash[3] = (self.state[0]) as u8;
+
+        self.hash[4] = (self.state[1] >> 24) as u8;
+        self.hash[5] = (self.state[1] >> 16) as u8;
+        self.hash[6] = (self.state[1] >> 8) as u8;
+        self.hash[7] = (self.state[1]) as u8;
+
+        self.hash[8] = (self.state[2] >> 24) as u8;
+        self.hash[9] = (self.state[2] >> 16) as u8;
+        self.hash[10] = (self.state[2] >> 8) as u8;
+        self.hash[11] = (self.state[2]) as u8;
+
+        self.hash[12] = (self.state[3] >> 24) as u8;
+        self.hash[13] = (self.state[3] >> 16) as u8;
+        self.hash[14] = (self.state[3] >> 8) as u8;
+        self.hash[15] = (self.state[3]) as u8;
+
+        self.hash[16] = (self.state[4] >> 24) as u8;
+        self.hash[17] = (self.state[4] >> 16) as u8;
+        self.hash[18] = (self.state[4] >> 8) as u8;
+        self.hash[19] = (self.state[4]) as u8;
+
+        self.hash[20] = (self.state[5] >> 24) as u8;
+        self.hash[21] = (self.state[5] >> 16) as u8;
+        self.hash[22] = (self.state[5] >> 8) as u8;
+        self.hash[23] = (self.state[5]) as u8;
+
+        self.hash[24] = (self.state[6] >> 24) as u8;
+        self.hash[25] = (self.state[6] >> 16) as u8;
+        self.hash[26] = (self.state[6] >> 8) as u8;
+        self.hash[27] = (self.state[6]) as u8;
+
+        self.hash[28] = (self.state[7] >> 24) as u8;
+        self.hash[29] = (self.state[7] >> 16) as u8;
+        self.hash[30] = (self.state[7] >> 8) as u8;
+        self.hash[31] = (self.state[7]) as u8;
     }
 
     ///
