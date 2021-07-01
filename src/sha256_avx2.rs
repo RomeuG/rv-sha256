@@ -500,45 +500,45 @@ impl Sha256Avx2 {
         let state_h = unsafe { core::mem::transmute::<&__m256i, &[u32; 8]>(&self.state[7]) };
 
         for i in 0..8 {
-            self.hash[i][0] = (state_a[i] >> 24) as u8;
-            self.hash[i][1] = (state_a[i] >> 16) as u8;
-            self.hash[i][2] = (state_a[i] >> 8) as u8;
-            self.hash[i][3] = (state_a[i]) as u8;
+            self.hash[7 - i][0] = (state_a[i] >> 24) as u8;
+            self.hash[7 - i][1] = (state_a[i] >> 16) as u8;
+            self.hash[7 - i][2] = (state_a[i] >> 8) as u8;
+            self.hash[7 - i][3] = (state_a[i]) as u8;
 
-            self.hash[i][4] = (state_b[i] >> 24) as u8;
-            self.hash[i][5] = (state_b[i] >> 16) as u8;
-            self.hash[i][6] = (state_b[i] >> 8) as u8;
-            self.hash[i][7] = (state_b[i]) as u8;
+            self.hash[7 - i][4] = (state_b[i] >> 24) as u8;
+            self.hash[7 - i][5] = (state_b[i] >> 16) as u8;
+            self.hash[7 - i][6] = (state_b[i] >> 8) as u8;
+            self.hash[7 - i][7] = (state_b[i]) as u8;
 
-            self.hash[i][8] = (state_c[i] >> 24) as u8;
-            self.hash[i][9] = (state_c[i] >> 16) as u8;
-            self.hash[i][10] = (state_c[i] >> 8) as u8;
-            self.hash[i][11] = (state_c[i]) as u8;
+            self.hash[7 - i][8] = (state_c[i] >> 24) as u8;
+            self.hash[7 - i][9] = (state_c[i] >> 16) as u8;
+            self.hash[7 - i][10] = (state_c[i] >> 8) as u8;
+            self.hash[7 - i][11] = (state_c[i]) as u8;
 
-            self.hash[i][12] = (state_d[i] >> 24) as u8;
-            self.hash[i][13] = (state_d[i] >> 16) as u8;
-            self.hash[i][14] = (state_d[i] >> 8) as u8;
-            self.hash[i][15] = (state_d[i]) as u8;
+            self.hash[7 - i][12] = (state_d[i] >> 24) as u8;
+            self.hash[7 - i][13] = (state_d[i] >> 16) as u8;
+            self.hash[7 - i][14] = (state_d[i] >> 8) as u8;
+            self.hash[7 - i][15] = (state_d[i]) as u8;
 
-            self.hash[i][16] = (state_e[i] >> 24) as u8;
-            self.hash[i][17] = (state_e[i] >> 16) as u8;
-            self.hash[i][18] = (state_e[i] >> 8) as u8;
-            self.hash[i][19] = (state_e[i]) as u8;
+            self.hash[7 - i][16] = (state_e[i] >> 24) as u8;
+            self.hash[7 - i][17] = (state_e[i] >> 16) as u8;
+            self.hash[7 - i][18] = (state_e[i] >> 8) as u8;
+            self.hash[7 - i][19] = (state_e[i]) as u8;
 
-            self.hash[i][20] = (state_f[i] >> 24) as u8;
-            self.hash[i][21] = (state_f[i] >> 16) as u8;
-            self.hash[i][22] = (state_f[i] >> 8) as u8;
-            self.hash[i][23] = (state_f[i]) as u8;
+            self.hash[7 - i][20] = (state_f[i] >> 24) as u8;
+            self.hash[7 - i][21] = (state_f[i] >> 16) as u8;
+            self.hash[7 - i][22] = (state_f[i] >> 8) as u8;
+            self.hash[7 - i][23] = (state_f[i]) as u8;
 
-            self.hash[i][24] = (state_g[i] >> 24) as u8;
-            self.hash[i][25] = (state_g[i] >> 16) as u8;
-            self.hash[i][26] = (state_g[i] >> 8) as u8;
-            self.hash[i][27] = (state_g[i]) as u8;
+            self.hash[7 - i][24] = (state_g[i] >> 24) as u8;
+            self.hash[7 - i][25] = (state_g[i] >> 16) as u8;
+            self.hash[7 - i][26] = (state_g[i] >> 8) as u8;
+            self.hash[7 - i][27] = (state_g[i]) as u8;
 
-            self.hash[i][28] = (state_h[i] >> 24) as u8;
-            self.hash[i][29] = (state_h[i] >> 16) as u8;
-            self.hash[i][30] = (state_h[i] >> 8) as u8;
-            self.hash[i][31] = (state_h[i]) as u8;
+            self.hash[7 - i][28] = (state_h[i] >> 24) as u8;
+            self.hash[7 - i][29] = (state_h[i] >> 16) as u8;
+            self.hash[7 - i][30] = (state_h[i] >> 8) as u8;
+            self.hash[7 - i][31] = (state_h[i]) as u8;
         }
     }
 
