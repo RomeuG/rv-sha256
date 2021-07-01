@@ -120,77 +120,16 @@ macro_rules! SHA256_W_ASSIGN {
     ($self:ident,$i:expr,$w:expr) => {
         $w = unsafe {
             _mm256_set_epi32(
-                (($self.data[7][$i] as i32) << 24)
-                    | (($self.data[7][$i + 1] as i32) << 16)
-                    | (($self.data[7][$i + 2] as i32) << 8)
-                    | ($self.data[7][$i + 3] as i32),
-                (($self.data[6][$i] as i32) << 24)
-                    | (($self.data[6][$i + 1] as i32) << 16)
-                    | (($self.data[6][$i + 2] as i32) << 8)
-                    | ($self.data[6][$i + 3] as i32),
-                (($self.data[5][$i] as i32) << 24)
-                    | (($self.data[5][$i + 1] as i32) << 16)
-                    | (($self.data[5][$i + 2] as i32) << 8)
-                    | ($self.data[5][$i + 3] as i32),
-                (($self.data[4][$i] as i32) << 24)
-                    | (($self.data[4][$i + 1] as i32) << 16)
-                    | (($self.data[4][$i + 2] as i32) << 8)
-                    | ($self.data[4][$i + 3] as i32),
-                (($self.data[3][$i] as i32) << 24)
-                    | (($self.data[3][$i + 1] as i32) << 16)
-                    | (($self.data[3][$i + 2] as i32) << 8)
-                    | ($self.data[3][$i + 3] as i32),
-                (($self.data[2][$i] as i32) << 24)
-                    | (($self.data[2][$i + 1] as i32) << 16)
-                    | (($self.data[2][$i + 2] as i32) << 8)
-                    | ($self.data[2][$i + 3] as i32),
-                (($self.data[1][$i] as i32) << 24)
-                    | (($self.data[1][$i + 1] as i32) << 16)
-                    | (($self.data[1][$i + 2] as i32) << 8)
-                    | ($self.data[1][$i + 3] as i32),
-                (($self.data[0][$i] as i32) << 24)
-                    | (($self.data[0][$i + 1] as i32) << 16)
-                    | (($self.data[0][$i + 2] as i32) << 8)
-                    | ($self.data[0][$i + 3] as i32),
+                i32::from_be_bytes(*(&$self.data[0][$i] as *const u8 as *const [u8; 4])),
+                i32::from_be_bytes(*(&$self.data[1][$i] as *const u8 as *const [u8; 4])),
+                i32::from_be_bytes(*(&$self.data[2][$i] as *const u8 as *const [u8; 4])),
+                i32::from_be_bytes(*(&$self.data[3][$i] as *const u8 as *const [u8; 4])),
+                i32::from_be_bytes(*(&$self.data[4][$i] as *const u8 as *const [u8; 4])),
+                i32::from_be_bytes(*(&$self.data[5][$i] as *const u8 as *const [u8; 4])),
+                i32::from_be_bytes(*(&$self.data[6][$i] as *const u8 as *const [u8; 4])),
+                i32::from_be_bytes(*(&$self.data[7][$i] as *const u8 as *const [u8; 4])),
             )
         }
-
-        // $w = unsafe {
-        //     _mm256_set_epi32(
-        //         (self.data[7][index2_u] as i32)
-        //             | ((self.data[7][index2_u + 1] as i32) << 8)
-        //             | ((self.data[7][index2_u + 2] as i32) << 16)
-        //             | ((self.data[7][index2_u + 3] as i32) << 24),
-        //         (self.data[6][index2_u] as i32)
-        //             | ((self.data[6][index2_u + 1] as i32) << 8)
-        //             | ((self.data[6][index2_u + 2] as i32) << 16)
-        //             | ((self.data[6][index2_u + 3] as i32) << 24),
-        //         (self.data[5][index2_u] as i32)
-        //             | ((self.data[5][index2_u + 1] as i32) << 8)
-        //             | ((self.data[5][index2_u + 2] as i32) << 16)
-        //             | ((self.data[5][index2_u + 3] as i32) << 24),
-        //         (self.data[4][index2_u] as i32)
-        //             | ((self.data[4][index2_u + 1] as i32) << 8)
-        //             | ((self.data[4][index2_u + 2] as i32) << 16)
-        //             | ((self.data[4][index2_u + 3] as i32) << 24),
-        //         (self.data[3][index2_u] as i32)
-        //             | ((self.data[3][index2_u + 1] as i32) << 8)
-        //             | ((self.data[3][index2_u + 2] as i32) << 16)
-        //             | ((self.data[3][index2_u + 3] as i32) << 24),
-        //         (self.data[2][index2_u] as i32)
-        //             | ((self.data[2][index2_u + 1] as i32) << 8)
-        //             | ((self.data[2][index2_u + 2] as i32) << 16)
-        //             | ((self.data[2][index2_u + 3] as i32) << 24),
-        //         (self.data[1][index2_u] as i32)
-        //             | ((self.data[1][index2_u + 1] as i32) << 8)
-        //             | ((self.data[1][index2_u + 2] as i32) << 16)
-        //             | ((self.data[1][index2_u + 3] as i32) << 24),
-        //         (self.data[0][index2_u] as i32)
-        //             | ((self.data[0][index2_u + 1] as i32) << 8)
-        //             | ((self.data[0][index2_u + 2] as i32) << 16)
-        //             | ((self.data[0][index2_u + 3] as i32) << 24),
-        //     )
-        // }
     };
 }
 
@@ -551,23 +490,55 @@ impl Sha256Avx2 {
 
         self.transform();
 
-        for i in 0..4 {
-            for j in 0..8 {
-                let split_m256i =
-                    unsafe { core::mem::transmute::<&__m256i, &[u32; 8]>(&self.state[j]) };
+        let state_a = unsafe { core::mem::transmute::<&__m256i, &[u32; 8]>(&self.state[0]) };
+        let state_b = unsafe { core::mem::transmute::<&__m256i, &[u32; 8]>(&self.state[1]) };
+        let state_c = unsafe { core::mem::transmute::<&__m256i, &[u32; 8]>(&self.state[2]) };
+        let state_d = unsafe { core::mem::transmute::<&__m256i, &[u32; 8]>(&self.state[3]) };
+        let state_e = unsafe { core::mem::transmute::<&__m256i, &[u32; 8]>(&self.state[4]) };
+        let state_f = unsafe { core::mem::transmute::<&__m256i, &[u32; 8]>(&self.state[5]) };
+        let state_g = unsafe { core::mem::transmute::<&__m256i, &[u32; 8]>(&self.state[6]) };
+        let state_h = unsafe { core::mem::transmute::<&__m256i, &[u32; 8]>(&self.state[7]) };
 
-                let i2 = i + (j * 4);
-                let shift = 24 - (i * 8);
+        for i in 0..8 {
+            self.hash[i][0] = (state_a[i] >> 24) as u8;
+            self.hash[i][1] = (state_a[i] >> 16) as u8;
+            self.hash[i][2] = (state_a[i] >> 8) as u8;
+            self.hash[i][3] = (state_a[i]) as u8;
 
-                self.hash[0][i2] = ((split_m256i[j] >> shift) & 0x000000ff) as u8;
-                self.hash[1][i2] = ((split_m256i[j] >> shift) & 0x000000ff) as u8;
-                self.hash[2][i2] = ((split_m256i[j] >> shift) & 0x000000ff) as u8;
-                self.hash[3][i2] = ((split_m256i[j] >> shift) & 0x000000ff) as u8;
-                self.hash[4][i2] = ((split_m256i[j] >> shift) & 0x000000ff) as u8;
-                self.hash[5][i2] = ((split_m256i[j] >> shift) & 0x000000ff) as u8;
-                self.hash[6][i2] = ((split_m256i[j] >> shift) & 0x000000ff) as u8;
-                self.hash[7][i2] = ((split_m256i[j] >> shift) & 0x000000ff) as u8;
-            }
+            self.hash[i][4] = (state_b[i] >> 24) as u8;
+            self.hash[i][5] = (state_b[i] >> 16) as u8;
+            self.hash[i][6] = (state_b[i] >> 8) as u8;
+            self.hash[i][7] = (state_b[i]) as u8;
+
+            self.hash[i][8] = (state_c[i] >> 24) as u8;
+            self.hash[i][9] = (state_c[i] >> 16) as u8;
+            self.hash[i][10] = (state_c[i] >> 8) as u8;
+            self.hash[i][11] = (state_c[i]) as u8;
+
+            self.hash[i][12] = (state_d[i] >> 24) as u8;
+            self.hash[i][13] = (state_d[i] >> 16) as u8;
+            self.hash[i][14] = (state_d[i] >> 8) as u8;
+            self.hash[i][15] = (state_d[i]) as u8;
+
+            self.hash[i][16] = (state_e[i] >> 24) as u8;
+            self.hash[i][17] = (state_e[i] >> 16) as u8;
+            self.hash[i][18] = (state_e[i] >> 8) as u8;
+            self.hash[i][19] = (state_e[i]) as u8;
+
+            self.hash[i][20] = (state_f[i] >> 24) as u8;
+            self.hash[i][21] = (state_f[i] >> 16) as u8;
+            self.hash[i][22] = (state_f[i] >> 8) as u8;
+            self.hash[i][23] = (state_f[i]) as u8;
+
+            self.hash[i][24] = (state_g[i] >> 24) as u8;
+            self.hash[i][25] = (state_g[i] >> 16) as u8;
+            self.hash[i][26] = (state_g[i] >> 8) as u8;
+            self.hash[i][27] = (state_g[i]) as u8;
+
+            self.hash[i][28] = (state_h[i] >> 24) as u8;
+            self.hash[i][29] = (state_h[i] >> 16) as u8;
+            self.hash[i][30] = (state_h[i] >> 8) as u8;
+            self.hash[i][31] = (state_h[i]) as u8;
         }
     }
 
