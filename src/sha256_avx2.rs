@@ -25,54 +25,43 @@ pub fn rotate_right_avx2(x: __m256i, n: i32) -> __m256i {
 // choose
 #[inline(always)]
 fn ch_avx2(x: __m256i, y: __m256i, z: __m256i) -> __m256i {
-    unsafe {
-        let a = _mm256_and_si256(x, y);
-        let b = _mm256_andnot_si256(x, z);
-        let c = _mm256_xor_si256(a, b);
-
-        c
-    }
+    unsafe { _mm256_xor_si256(_mm256_and_si256(x, y), _mm256_andnot_si256(x, z)) }
 }
 
 // majority
 #[inline(always)]
 fn maj_avx2(x: __m256i, y: __m256i, z: __m256i) -> __m256i {
     unsafe {
-        let a = _mm256_and_si256(x, y);
-        let b = _mm256_and_si256(x, z);
-        let c = _mm256_and_si256(y, z);
-
-        let d = _mm256_xor_si256(a, b);
-        let e = _mm256_xor_si256(d, c);
-        e
+        _mm256_xor_si256(
+            _mm256_xor_si256(_mm256_and_si256(x, y), _mm256_and_si256(x, z)),
+            _mm256_and_si256(y, z),
+        )
     }
 }
 
 #[inline(always)]
 fn ep0_avx2(x: __m256i) -> __m256i {
     unsafe {
-        let r1 = rotate_right_avx2(x, 9);
-        let r1_xor = _mm256_xor_si256(r1, x);
-
-        let r2 = rotate_right_avx2(r1_xor, 11);
-        let r2_xor = _mm256_xor_si256(r2, x);
-
-        let r3 = rotate_right_avx2(r2_xor, 2);
-        r3
+        rotate_right_avx2(
+            _mm256_xor_si256(
+                rotate_right_avx2(_mm256_xor_si256(rotate_right_avx2(x, 9), x), 11),
+                x,
+            ),
+            2,
+        )
     }
 }
 
 #[inline(always)]
 fn ep1_avx2(x: __m256i) -> __m256i {
     unsafe {
-        let r1 = rotate_right_avx2(x, 14);
-        let r1_xor = _mm256_xor_si256(r1, x);
-
-        let r2 = rotate_right_avx2(r1_xor, 5);
-        let r2_xor = _mm256_xor_si256(r2, x);
-
-        let r3 = rotate_right_avx2(r2_xor, 6);
-        r3
+        rotate_right_avx2(
+            _mm256_xor_si256(
+                rotate_right_avx2(_mm256_xor_si256(rotate_right_avx2(x, 14), x), 5),
+                x,
+            ),
+            6,
+        )
     }
 }
 
@@ -89,10 +78,7 @@ fn sig0_avx2(x: __m256i) -> __m256i {
         let b = rotate_right_avx2(x, 18);
         let c = constify_imm8!(3, srli);
 
-        let xor1 = _mm256_xor_si256(a, b);
-        let xor2 = _mm256_xor_si256(xor1, c);
-
-        xor2
+        _mm256_xor_si256(_mm256_xor_si256(a, b), c)
     }
 }
 
@@ -109,10 +95,7 @@ fn sig1_avx2(x: __m256i) -> __m256i {
         let b = rotate_right_avx2(x, 19);
         let c = constify_imm8!(10, srli);
 
-        let xor1 = _mm256_xor_si256(a, b);
-        let xor2 = _mm256_xor_si256(xor1, c);
-
-        xor2
+        _mm256_xor_si256(_mm256_xor_si256(a, b), c)
     }
 }
 
@@ -135,30 +118,31 @@ macro_rules! SHA256_W_ASSIGN {
 
 macro_rules! SHA256_FUNCTION_16 {
     ($self:ident,$a:expr,$b:expr,$c:expr,$d:expr,$e:expr,$f:expr,$g:expr,$h:expr,$i:expr,$w:expr,$j:expr) => {
-        let ch_res = ch_avx2($e, $f, $g);
-        let maj_res = maj_avx2($a, $b, $c);
-        let ep0_res = ep0_avx2($a);
-        let ep1_res = ep1_avx2($e);
-
         unsafe {
-            let mut t1 = _mm256_add_epi32($h, ep1_res);
-            t1 = _mm256_add_epi32(t1, ch_res);
-            t1 = _mm256_add_epi32(t1, _mm256_set1_epi32(K[$i] as i32));
-            t1 = _mm256_add_epi32(t1, $w);
+            let temp1 = _mm256_add_epi32(
+                $h,
+                _mm256_add_epi32(
+                    ep1_avx2($e),
+                    _mm256_add_epi32(
+                        ch_avx2($e, $f, $g),
+                        _mm256_add_epi32($w, _mm256_set1_epi32(K[$i] as i32)),
+                    ),
+                ),
+            );
 
-            let t2 = _mm256_add_epi32(ep0_res, maj_res);
+            let temp2 = _mm256_add_epi32(ep0_avx2($a), maj_avx2($a, $b, $c));
 
             $h = $g;
             $g = $f;
             $f = $e;
 
-            $e = _mm256_add_epi32($d, t1);
+            $e = _mm256_add_epi32($d, temp1);
 
             $d = $c;
             $c = $b;
             $b = $a;
 
-            $a = _mm256_add_epi32(t1, t2);
+            $a = _mm256_add_epi32(temp1, temp2);
         }
     };
 }
