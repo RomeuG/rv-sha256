@@ -114,14 +114,15 @@ Benchmarks
 ==========
 
 ```
-test tests::bench_sha256_128bytes      ... bench:         745 ns/iter (+/- 211)
-test tests::bench_sha256_256bytes      ... bench:       1,270 ns/iter (+/- 66)
-test tests::bench_sha256_32bytes       ... bench:         259 ns/iter (+/- 21)
-test tests::bench_sha256_64bytes       ... bench:         490 ns/iter (+/- 22)
-test tests::bench_sha256_avx2_128bytes ... bench:       1,603 ns/iter (+/- 68)
-test tests::bench_sha256_avx2_256bytes ... bench:       2,690 ns/iter (+/- 97)
-test tests::bench_sha256_avx2_32bytes  ... bench:         583 ns/iter (+/- 51)
-test tests::bench_sha256_avx2_64bytes  ... bench:       1,064 ns/iter (+/- 31)
+test tests::bench_sha256_128bytes      ... bench:         700 ns/iter (+/- 15)
+test tests::bench_sha256_256bytes      ... bench:       1,188 ns/iter (+/- 47)
+test tests::bench_sha256_32bytes       ... bench:         240 ns/iter (+/- 6)
+test tests::bench_sha256_64bytes       ... bench:         457 ns/iter (+/- 9)
+
+test tests::bench_sha256_avx2_128bytes ... bench:       1,576 ns/iter (+/- 31)
+test tests::bench_sha256_avx2_256bytes ... bench:       2,657 ns/iter (+/- 116)
+test tests::bench_sha256_avx2_32bytes  ... bench:         575 ns/iter (+/- 20)
+test tests::bench_sha256_avx2_64bytes  ... bench:       1,043 ns/iter (+/- 29)
 ```
 
 On the AVX2 implementation
