@@ -38,7 +38,7 @@ fn main() {
     let test_str5 = "this is a test string";
     let test_str6 = "this is a test string to";
     let test_str7 = "this is a test string to test";
-    let test_str8 = "this is a test string to test md5";
+    let test_str8 = "this is a test string to test sha256";
 
     let hash1 = Sha256::digest(test_str1.as_bytes());
     let hash2 = Sha256::digest(test_str2.as_bytes());
