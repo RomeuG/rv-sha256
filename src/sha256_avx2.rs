@@ -314,33 +314,97 @@ impl Sha256Avx2 {
         self.state[7] = unsafe { _mm256_add_epi32(self.state[7], h) };
     }
 
+    ///
+    /// Updates hashes with new value
+    ///
+    /// # Arguments
+    ///
+    /// * `data` - Data as *[u8]
+    ///
     #[inline(always)]
-    fn update1(&mut self, data: &[u8]) {
+    pub fn update1(&mut self, data: &[u8]) {
         self.update(data, data, data, data, data, data, data, data);
     }
 
+    ///
+    /// Updates hashes with new values
+    ///
+    /// # Arguments
+    ///
+    /// * `data1` - Data as *[u8]
+    /// * `data2` - Data as *[u8]
+    ///
     #[inline(always)]
-    fn update2(&mut self, data1: &[u8], data2: &[u8]) {
+    pub fn update2(&mut self, data1: &[u8], data2: &[u8]) {
         self.update(data1, data2, data2, data2, data2, data2, data2, data2);
     }
 
+    ///
+    /// Updates hashes with new values
+    ///
+    /// # Arguments
+    ///
+    /// * `data1` - Data as *[u8]
+    /// * `data2` - Data as *[u8]
+    /// * `data3` - Data as *[u8]
+    ///
     #[inline(always)]
-    fn update3(&mut self, data1: &[u8], data2: &[u8], data3: &[u8]) {
+    pub fn update3(&mut self, data1: &[u8], data2: &[u8], data3: &[u8]) {
         self.update(data1, data2, data3, data3, data3, data3, data3, data3);
     }
 
+    ///
+    /// Updates hashes with new values
+    ///
+    /// # Arguments
+    ///
+    /// * `data1` - Data as *[u8]
+    /// * `data2` - Data as *[u8]
+    /// * `data3` - Data as *[u8]
+    /// * `data4` - Data as *[u8]
+    ///
     #[inline(always)]
-    fn update4(&mut self, data1: &[u8], data2: &[u8], data3: &[u8], data4: &[u8]) {
+    pub fn update4(&mut self, data1: &[u8], data2: &[u8], data3: &[u8], data4: &[u8]) {
         self.update(data1, data2, data3, data4, data4, data4, data4, data4);
     }
 
+    ///
+    /// Updates hashes with new values
+    ///
+    /// # Arguments
+    ///
+    /// * `data1` - Data as *[u8]
+    /// * `data2` - Data as *[u8]
+    /// * `data3` - Data as *[u8]
+    /// * `data4` - Data as *[u8]
+    /// * `data5` - Data as *[u8]
+    ///
     #[inline(always)]
-    fn update5(&mut self, data1: &[u8], data2: &[u8], data3: &[u8], data4: &[u8], data5: &[u8]) {
+    pub fn update5(
+        &mut self,
+        data1: &[u8],
+        data2: &[u8],
+        data3: &[u8],
+        data4: &[u8],
+        data5: &[u8],
+    ) {
         self.update(data1, data2, data3, data4, data5, data5, data5, data5);
     }
 
+    ///
+    /// Updates hashes with new values
+    ///
+    /// # Arguments
+    ///
+    /// * `data1` - Data as *[u8]
+    /// * `data2` - Data as *[u8]
+    /// * `data3` - Data as *[u8]
+    /// * `data4` - Data as *[u8]
+    /// * `data5` - Data as *[u8]
+    /// * `data6` - Data as *[u8]
+    ///
     #[inline(always)]
-    fn update6(
+    pub fn update6(
         &mut self,
         data1: &[u8],
         data2: &[u8],
@@ -352,8 +416,21 @@ impl Sha256Avx2 {
         self.update(data1, data2, data3, data4, data5, data6, data6, data6);
     }
 
+    ///
+    /// Updates hashes with new values
+    ///
+    /// # Arguments
+    ///
+    /// * `data1` - Data as *[u8]
+    /// * `data2` - Data as *[u8]
+    /// * `data3` - Data as *[u8]
+    /// * `data4` - Data as *[u8]
+    /// * `data5` - Data as *[u8]
+    /// * `data6` - Data as *[u8]
+    /// * `data7` - Data as *[u8]
+    ///
     #[inline(always)]
-    fn update7(
+    pub fn update7(
         &mut self,
         data1: &[u8],
         data2: &[u8],
@@ -366,8 +443,22 @@ impl Sha256Avx2 {
         self.update(data1, data2, data3, data4, data5, data6, data7, data7);
     }
 
+    ///
+    /// Updates hashes with new values
+    ///
+    /// # Arguments
+    ///
+    /// * `data1` - Data as *[u8]
+    /// * `data2` - Data as *[u8]
+    /// * `data3` - Data as *[u8]
+    /// * `data4` - Data as *[u8]
+    /// * `data5` - Data as *[u8]
+    /// * `data6` - Data as *[u8]
+    /// * `data7` - Data as *[u8]
+    /// * `data8` - Data as *[u8]
+    ///
     #[inline(always)]
-    fn update8(
+    pub fn update8(
         &mut self,
         data1: &[u8],
         data2: &[u8],
@@ -381,7 +472,7 @@ impl Sha256Avx2 {
         self.update(data1, data2, data3, data4, data5, data6, data7, data8);
     }
 
-    pub fn update(
+    fn update(
         &mut self,
         data1: &[u8],
         data2: &[u8],
@@ -415,6 +506,9 @@ impl Sha256Avx2 {
         }
     }
 
+    ///
+    /// Generates final hash
+    ///
     pub fn finalize(&mut self) {
         let mut current_length: usize = self.len as usize;
 
@@ -526,6 +620,14 @@ impl Sha256Avx2 {
         }
     }
 
+    ///
+    /// Receives string as array of bytes.
+    /// Returns [[u8; 32]; 8]
+    ///
+    /// # Arguments
+    ///
+    /// * `input` - Data as &[u8]
+    ///
     pub fn digest(input: &[u8]) -> [[u8; 32]; 8] {
         let mut object = Self::default();
         object.update1(input);
@@ -533,6 +635,15 @@ impl Sha256Avx2 {
         object.hash
     }
 
+    ///
+    /// Receives string as array of bytes.
+    /// Returns [[u8; 32]; 8]
+    ///
+    /// # Arguments
+    ///
+    /// * `input1` - Data as &[u8]
+    /// * `input2` - Data as &[u8]
+    ///
     pub fn digest2(input1: &[u8], input2: &[u8]) -> [[u8; 32]; 8] {
         let mut object = Self::default();
         object.update2(input1, input2);
@@ -540,6 +651,16 @@ impl Sha256Avx2 {
         object.hash
     }
 
+    ///
+    /// Receives string as array of bytes.
+    /// Returns [[u8; 32]; 8]
+    ///
+    /// # Arguments
+    ///
+    /// * `input1` - Data as &[u8]
+    /// * `input2` - Data as &[u8]
+    /// * `input3` - Data as &[u8]
+    ///
     pub fn digest3(input1: &[u8], input2: &[u8], input3: &[u8]) -> [[u8; 32]; 8] {
         let mut object = Self::default();
         object.update3(input1, input2, input3);
@@ -547,6 +668,17 @@ impl Sha256Avx2 {
         object.hash
     }
 
+    ///
+    /// Receives string as array of bytes.
+    /// Returns [[u8; 32]; 8]
+    ///
+    /// # Arguments
+    ///
+    /// * `input1` - Data as &[u8]
+    /// * `input2` - Data as &[u8]
+    /// * `input3` - Data as &[u8]
+    /// * `input4` - Data as &[u8]
+    ///
     pub fn digest4(input1: &[u8], input2: &[u8], input3: &[u8], input4: &[u8]) -> [[u8; 32]; 8] {
         let mut object = Self::default();
         object.update4(input1, input2, input3, input4);
@@ -554,6 +686,18 @@ impl Sha256Avx2 {
         object.hash
     }
 
+    ///
+    /// Receives string as array of bytes.
+    /// Returns [[u8; 32]; 8]
+    ///
+    /// # Arguments
+    ///
+    /// * `input1` - Data as &[u8]
+    /// * `input2` - Data as &[u8]
+    /// * `input3` - Data as &[u8]
+    /// * `input4` - Data as &[u8]
+    /// * `input5` - Data as &[u8]
+    ///
     pub fn digest5(
         input1: &[u8],
         input2: &[u8],
@@ -567,6 +711,19 @@ impl Sha256Avx2 {
         object.hash
     }
 
+    ///
+    /// Receives string as array of bytes.
+    /// Returns [[u8; 32]; 8]
+    ///
+    /// # Arguments
+    ///
+    /// * `input1` - Data as &[u8]
+    /// * `input2` - Data as &[u8]
+    /// * `input3` - Data as &[u8]
+    /// * `input4` - Data as &[u8]
+    /// * `input5` - Data as &[u8]
+    /// * `input6` - Data as &[u8]
+    ///
     pub fn digest6(
         input1: &[u8],
         input2: &[u8],
@@ -581,6 +738,20 @@ impl Sha256Avx2 {
         object.hash
     }
 
+    ///
+    /// Receives string as array of bytes.
+    /// Returns [[u8; 32]; 8]
+    ///
+    /// # Arguments
+    ///
+    /// * `input1` - Data as &[u8]
+    /// * `input2` - Data as &[u8]
+    /// * `input3` - Data as &[u8]
+    /// * `input4` - Data as &[u8]
+    /// * `input5` - Data as &[u8]
+    /// * `input6` - Data as &[u8]
+    /// * `input7` - Data as &[u8]
+    ///
     pub fn digest7(
         input1: &[u8],
         input2: &[u8],
@@ -596,6 +767,21 @@ impl Sha256Avx2 {
         object.hash
     }
 
+    ///
+    /// Receives string as array of bytes.
+    /// Returns [[u8; 32]; 8]
+    ///
+    /// # Arguments
+    ///
+    /// * `input1` - Data as &[u8]
+    /// * `input2` - Data as &[u8]
+    /// * `input3` - Data as &[u8]
+    /// * `input4` - Data as &[u8]
+    /// * `input5` - Data as &[u8]
+    /// * `input6` - Data as &[u8]
+    /// * `input7` - Data as &[u8]
+    /// * `input8` - Data as &[u8]
+    ///
     pub fn digest8(
         input1: &[u8],
         input2: &[u8],

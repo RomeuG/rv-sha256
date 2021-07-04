@@ -2,6 +2,9 @@
 #![feature(stmt_expr_attributes)]
 #![feature(core_intrinsics)]
 #![feature(test)]
+#![allow(clippy::many_single_char_names)]
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::needless_range_loop)]
 
 #[macro_use]
 pub mod utils;
